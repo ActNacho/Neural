@@ -1,0 +1,40 @@
+   Balance_Inicial=AccountInfoDouble(ACCOUNT_BALANCE);
+   if(actualmonth!=Month()){   
+      actualmonth=Month();
+      nummonths++;
+   }
+   if(nummonths==6){
+      Vector_Beneficio[numsemestre]=Beneficio_Semestral(Balance_Inicial);
+      numsemestre++;
+      nummonths=0;
+   }
+double OnTester()
+{
+   //---
+   double ret=0;
+   //---
+   if (TesterStatistics(STAT_TRADES)!=0)
+   {
+      double profit= TesterStatistics(STAT_PROFIT);
+      double drawdownmax = TesterStatistics(STAT_EQUITY_DD);
+      double trades = TesterStatistics(STAT_TRADES);
+      double perc_drawdown_max = TesterStatistics(STAT_EQUITYDD_PERCENT);
+      
+      Vector_Beneficio[numsemestre]= Beneficio_Semestral(Balance_Inicial);
+      double prueba=0;
+      for(int i=0;i<ArraySize(Vector_Beneficio);i++)
+      {
+         prueba+= Vector_Beneficio[i];
+         Alert("Semestre_",i,"=",Vector_Beneficio[i]);
+      }
+      Alert("Prueba=",prueba);
+      Alert("Profit= ",profit,",DDMAX= ",drawdownmax,",trades=",trades,"%DDMAX",perc_drawdown_max); 
+      double weight_trades = (trades/(num_years *144));
+      if(weight_trades>1){weight_trades=1;}
+      //ret =weight_trades*(profit/drawdownmax)*((100-perc_drawdown_max)/100)*(1/num_years);//*proportion2(Vector_Beneficio,Balance_Inicial);    
+      //ret = (1.0/3.0)*weight_trades*((profit/drawdownmax)+proportion3(Vector_Beneficio,Balance_Inicial)+proportion(Vector_Beneficio,Balance_Inicial))*((100-perc_drawdown_max)/100)*(1/num_years);    
+      //ret =weight_trades*((100-perc_drawdown_max)/100)*(1/num_years)*proportion3(Vector_Beneficio,Balance_Inicial);    
+      ret = weight_trades*(proportion(Vector_Beneficio,Balance_Inicial)+proportion3(Vector_Beneficio,Balance_Inicial))*MathExp(((100-perc_drawdown_max)/100));
+   }
+   return(ret);
+}
